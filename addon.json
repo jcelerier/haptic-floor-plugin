@@ -1,7 +1,7 @@
 {
   "src": "<url to the .zip file created by the release script>",
   "name": "Haptic Floor Add-on",
-  "raw_name": "score-addon-my-avnd-effect",
+  "raw_name": "score-addon-haptic-floor",
   "version": "1.0",
   "kind": "addon",
   "short": "Haptic floor add-on",
