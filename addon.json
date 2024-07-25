@@ -1,0 +1,11 @@
+{
+  "src": "<url to the .zip file created by the release script>",
+  "name": "Haptic Floor Add-on",
+  "raw_name": "score-addon-my-avnd-effect",
+  "version": "1.0",
+  "kind": "addon",
+  "short": "Haptic floor add-on",
+  "long": "This addon provides an easy to use process to monitor the Haptic floor with ossia score.",
+  "small": "https://raw.githubusercontent.com/OSSIA/score-addon-tutorial/master/Deployment/icon.png",
+  "key": "b9b8acd0-21dc-4056-b36f-cf19532c9df4"
+}
