@@ -2,7 +2,7 @@
 #include <HapticFloor/HapticFloorModel.hpp>
 #include <halp/layout.hpp>
 
-namespace Example
+/*namespace Example
 {
 struct HapticFloor::ui
 {
@@ -17,3 +17,4 @@ struct HapticFloor::ui
   halp::item<&ins::gain> gain;
 };
 }
+*/

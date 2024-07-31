@@ -25,14 +25,21 @@ public:
     {
       halp_meta(language, "json")
       void update(HapticFloor& self) { self.loadLayout(); }
-    } layout;
-    halp::hslider_f32<"Height of node {}", halp::range{-1, 1, 0}> height;
 
+      static std::function<void(HapticFloor&, int)> on_controller_interaction()
+      {
+        return [](HapticFloor& object, int value) {
+          object.inputs.in_i.request_port_resize(value);
+        };
+      }
+
+    } layout;
+    halp::dynamic_port<halp::hslider_f32<"Input {}", halp::range{-1, 1, 0}>> in_i;
   } inputs;
 
   struct outs
   {
-    halp::val_port<"Output", std::vector<float>> out;
+    halp::val_port<"Output", float> out;
   } outputs;
 
   //haptic floor's nodes coordinate system
