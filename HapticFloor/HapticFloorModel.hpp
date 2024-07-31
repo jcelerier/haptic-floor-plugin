@@ -26,10 +26,12 @@ public:
       halp_meta(language, "json")
       void update(HapticFloor& self) { self.loadLayout(); }
 
-      static std::function<void(HapticFloor&, int)> on_controller_interaction()
+      static std::function<void(HapticFloor&, std::string_view)>
+      on_controller_interaction()
       {
-        return [](HapticFloor& object, int value) {
-          object.inputs.in_i.request_port_resize(value);
+        return [](HapticFloor& object, std::string_view value) {
+          int count = object.m_activenodes.size();
+          object.inputs.in_i.request_port_resize(count);
         };
       }
 
