@@ -36,12 +36,12 @@ public:
       }
 
     } layout;
-    halp::dynamic_port<halp::hslider_f32<"Input {}", halp::range{-1, 1, 0}>> in_i;
+    halp::dynamic_port<halp::hslider_f32<"Node {}", halp::range{-1, 1, 0}>> in_i;
   } inputs;
 
   struct outs
   {
-    halp::val_port<"Output", float> out;
+    halp::val_port<"Output", std::vector<float>> out;
   } outputs;
 
   //haptic floor's nodes coordinate system
@@ -58,8 +58,22 @@ public:
   std::vector<node> m_activenodes;
   std::vector<node> m_passivenodes;
 
-  // Defined in the .cpp
-  void operator()();
+  void operator()()
+  {
+    int numberOfChannels=m_activenodes.size();
+    std::vector<float> vec(numberOfChannels, 0.0f);
+    outputs.out.value = vec;
+    int index = 0;
+    for (const auto& val : inputs.in_i.ports) {
+      if (index < numberOfChannels) {
+        outputs.out.value[index] = val;
+        ++index;
+      } else {
+        index=0;
+      }
+    }
+  }
   void loadLayout();
 };
 }
+

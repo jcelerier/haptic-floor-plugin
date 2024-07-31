@@ -3,8 +3,6 @@
 
 namespace Example
 {
-void HapticFloor::operator()(){}
-
 void HapticFloor::loadLayout()
 {
   //Reset the layout
