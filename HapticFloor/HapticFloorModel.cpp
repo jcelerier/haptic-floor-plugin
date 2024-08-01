@@ -5,12 +5,13 @@ namespace Example
 {
 void HapticFloor::loadLayout()
 {
-  //Reset the layout
+  //reset the layout in case of an already loaded layout
   m_activenodes={};
   m_passivenodes={};
 
   try
   {
+    //parsing process to extract the data defining the haptic floor
     rapidjson::Document doc;
     doc.Parse(inputs.layout.value);
     if(doc.HasParseError())

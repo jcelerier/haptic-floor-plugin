@@ -6,6 +6,9 @@
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 #include <halp/dynamic_port.hpp>
+#include <halp/layout.hpp>
+#include <avnd/concepts/painter.hpp>
+#include <vector>
 
 namespace Example
 {
@@ -16,7 +19,7 @@ public:
   halp_meta(name, "Haptic floor")
   halp_meta(category, "Plugins")
   halp_meta(c_name, "hapticfloor")
-  halp_meta(author, "Hugo Genillier")
+  halp_meta(author, "Jean-Michaël Celerier, Hugo Genillier")
   halp_meta(uuid, "2fcacb29-7309-478a-9400-380ded08a64f")
 
   struct ins
@@ -25,7 +28,6 @@ public:
     {
       halp_meta(language, "json")
       void update(HapticFloor& self) { self.loadLayout(); }
-
       static std::function<void(HapticFloor&, std::string_view)>
       on_controller_interaction()
       {
@@ -34,7 +36,6 @@ public:
           object.inputs.in_i.request_port_resize(count);
         };
       }
-
     } layout;
     halp::dynamic_port<halp::hslider_f32<"Node {}", halp::range{-1, 1, 0}>> in_i;
   } inputs;
@@ -44,13 +45,11 @@ public:
     halp::val_port<"Output", std::vector<float>> out;
   } outputs;
 
-  //haptic floor's nodes coordinate system
   struct node {
     int x;
     int y;
     int channel;
     bool isActive;
-
     node(int x, int y, int channel = 0, bool isActive = false)
         : x(x), y(y), channel(channel), isActive(isActive) {}
   };
@@ -58,9 +57,110 @@ public:
   std::vector<node> m_activenodes;
   std::vector<node> m_passivenodes;
 
+  struct processor_to_ui
+  {
+    std::vector<node> send_activenodes;
+    std::vector<node> send_passivenodes;
+  };
+
+  std::function<void(processor_to_ui)> send_message;
+
+  struct custom_anim
+  {
+    using item_type = custom_anim;
+    static constexpr float width() { return 200.; }
+    static constexpr float height() { return 200.; }
+
+    std::vector<node> rect_activenodes;
+    std::vector<node> rect_passivenodes;
+
+    void paint(avnd::painter auto ctx)
+    {
+      ctx.set_stroke_width(2.0);
+
+      // Draw active nodes
+      for (const auto& node : rect_activenodes)
+      {
+        ctx.set_fill_color({0, 255, 0, 255});
+        ctx.draw_circle(node.x * 20, node.y * 20, 5);
+      }
+
+      // Draw passive nodes
+      for (const auto& node : rect_passivenodes)
+      {
+        ctx.set_fill_color({255, 0, 0, 255});
+        ctx.draw_circle(node.x * 20, node.y * 20, 5);
+      }
+
+      // Draw lines to form the mesh
+      ctx.set_stroke_color({0, 0, 255, 255});
+      ctx.begin_path();
+      for (const auto& node : rect_activenodes)
+      {
+        // Find neighboring nodes
+        for (const auto& neighbor : rect_activenodes)
+        {
+          if ((neighbor.x == node.x + 1 && neighbor.y == node.y) ||
+             (neighbor.x == node.x && neighbor.y == node.y + 1))
+          {
+            ctx.move_to(node.x * 20, node.y * 20);
+            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+          }
+        }
+      }
+      ctx.stroke();
+      ctx.close_path();
+      ctx.update();
+    }
+  };
+
+  struct ui
+  {
+    halp_meta(name, "Main")
+    halp_meta(layout, halp::layouts::hbox)
+    halp_meta(background, halp::colors::mid)
+
+    struct bus
+    {
+      static void process_message(ui& self, processor_to_ui msg)
+      {
+        self.haptic_floor.anim.rect_activenodes = msg.send_activenodes;
+        self.haptic_floor.anim.rect_passivenodes = msg.send_passivenodes;
+      }
+    };
+
+
+    struct {
+      halp_meta(layout, halp::layouts::hbox)
+      struct
+      {
+        halp_meta(layout, halp::layouts::grid)
+        halp_meta(columns, 1)
+        halp_meta(name, "inputs")
+        decltype(&ins::layout) int_widget = &ins::layout;
+      } layoutInput;
+      struct
+      {
+        halp_meta(layout, halp::layouts::grid)
+        halp_meta(columns, 1)
+        halp_meta(name, "inputs")
+        decltype(&ins::in_i) int_widget = &ins::in_i;
+      } nodesInput;
+    } input;
+
+    struct
+    {
+      halp_meta(layout, halp::layouts::vbox)
+      halp_meta(name, "haptic_floor")
+      halp_meta(width, 300)
+      halp_meta(height, 200)
+      halp::custom_actions_item<custom_anim> anim{};
+    } haptic_floor;
+  };
+
   void operator()()
   {
-    int numberOfChannels=m_activenodes.size();
+    int numberOfChannels = m_activenodes.size();
     std::vector<float> vec(numberOfChannels, 0.0f);
     outputs.out.value = vec;
     int index = 0;
@@ -69,11 +169,12 @@ public:
         outputs.out.value[index] = val;
         ++index;
       } else {
-        index=0;
+        index = 0;
       }
     }
+    send_message(processor_to_ui{.send_activenodes=m_activenodes,.send_passivenodes=m_passivenodes});
   }
   void loadLayout();
 };
-}
 
+}
