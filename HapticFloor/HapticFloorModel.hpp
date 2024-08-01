@@ -24,6 +24,7 @@ public:
 
   struct ins
   {
+    //the first input is a json layout file depicting the haptic floor (same layout filed used for mmesh)
     struct : halp::lineedit<"Layout file", "">
     {
       halp_meta(language, "json")
@@ -37,21 +38,22 @@ public:
         };
       }
     } layout;
+    //the actuators input are sliders [-1,1]
     halp::dynamic_port<halp::hslider_f32<"Node {}", halp::range{-1, 1, 0}>> in_i;
   } inputs;
 
+  //the output is a list of float [-1,1]
   struct outs
   {
     halp::val_port<"Output", std::vector<float>> out;
   } outputs;
 
   struct node {
-    int x;
-    int y;
-    int channel;
-    bool isActive;
-    node(int x, int y, int channel = 0, bool isActive = false)
-        : x(x), y(y), channel(channel), isActive(isActive) {}
+    halp_flag(relocatable);
+    int x = 0;
+    int y = 0;
+    int channel = 0;
+    bool isActive = false;
   };
 
   std::vector<node> m_activenodes;
@@ -59,6 +61,7 @@ public:
 
   struct processor_to_ui
   {
+    halp_flag(relocatable);
     std::vector<node> send_activenodes;
     std::vector<node> send_passivenodes;
   };
@@ -78,32 +81,32 @@ public:
     {
       ctx.set_stroke_width(2.0);
 
-      // Draw active nodes
-      for (const auto& node : rect_activenodes)
+      //draw active nodes
+      for (const auto& n : rect_activenodes)
       {
         ctx.set_fill_color({0, 255, 0, 255});
-        ctx.draw_circle(node.x * 20, node.y * 20, 5);
+        ctx.draw_circle(n.x * 20, n.y * 20, 5);
       }
 
-      // Draw passive nodes
-      for (const auto& node : rect_passivenodes)
+      //draw passive nodes
+      for (const auto& n : rect_passivenodes)
       {
         ctx.set_fill_color({255, 0, 0, 255});
-        ctx.draw_circle(node.x * 20, node.y * 20, 5);
+        ctx.draw_circle(n.x * 20, n.y * 20, 5);
       }
 
-      // Draw lines to form the mesh
+      //draw lines to form the mesh
       ctx.set_stroke_color({0, 0, 255, 255});
       ctx.begin_path();
-      for (const auto& node : rect_activenodes)
+      for (const auto& n : rect_activenodes)
       {
-        // Find neighboring nodes
+        //find neighboring nodes
         for (const auto& neighbor : rect_activenodes)
         {
-          if ((neighbor.x == node.x + 1 && neighbor.y == node.y) ||
-             (neighbor.x == node.x && neighbor.y == node.y + 1))
+          if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
+             (neighbor.x == n.x && neighbor.y == n.y + 1))
           {
-            ctx.move_to(node.x * 20, node.y * 20);
+            ctx.move_to(n.x * 20, n.y * 20);
             ctx.line_to(neighbor.x * 20, neighbor.y * 20);
           }
         }
