@@ -91,8 +91,8 @@ public:
           if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
              (neighbor.x == n.x && neighbor.y == n.y + 1))
           {
-            ctx.move_to(n.x * 20, n.y * 20);
-            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+            ctx.move_to(n.x * 50, n.y * 50);
+            ctx.line_to(neighbor.x * 50, neighbor.y * 50);
           }
         }
         for (const auto& neighbor : rect_passivenodes)
@@ -100,8 +100,8 @@ public:
           if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
              (neighbor.x == n.x && neighbor.y == n.y + 1))
           {
-            ctx.move_to(n.x * 20, n.y * 20);
-            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+            ctx.move_to(n.x * 50, n.y * 50);
+            ctx.line_to(neighbor.x * 50, neighbor.y * 50);
           }
         }
       }
@@ -113,8 +113,8 @@ public:
           if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
              (neighbor.x == n.x && neighbor.y == n.y + 1))
           {
-            ctx.move_to(n.x * 20, n.y * 20);
-            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+            ctx.move_to(n.x * 50, n.y * 50);
+            ctx.line_to(neighbor.x * 50, neighbor.y * 50);
           }
         }
         for (const auto& neighbor : rect_passivenodes)
@@ -122,34 +122,49 @@ public:
           if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
              (neighbor.x == n.x && neighbor.y == n.y + 1))
           {
-            ctx.move_to(n.x * 20, n.y * 20);
-            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+            ctx.move_to(n.x * 50, n.y * 50);
+            ctx.line_to(neighbor.x * 50, neighbor.y * 50);
           }
         }
       }
       ctx.stroke();
       ctx.close_path();
-
+      ctx.set_font("Comic Sans");
+      ctx.set_font_size(8.0);
+      ctx.begin_path();
       // Draw passive nodes
       for (const auto& n : rect_passivenodes)
       {
-        ctx.set_fill_color({0, 0, 255, 255}); // Blue fill
-        ctx.set_stroke_color({0, 0, 255, 255}); // Blue stroke
-        ctx.draw_circle(n.x * 20, n.y * 20, 5);
+        ctx.set_fill_color({224,176,30,255}); // Blue fill
+        ctx.set_stroke_color({255,255,255,255}); // Blue stroke
+        ctx.draw_circle(n.x * 50, n.y * 50, 10);
         ctx.fill();
         ctx.stroke();
       }
+      ctx.close_path();
+      ctx.begin_path();
       // Draw active nodes
+
       for (const auto& n : rect_activenodes)
       {
-        ctx.set_fill_color({0, 255, 0, 255}); // Green fill
-        ctx.set_stroke_color({0, 255, 0, 255}); // Green stroke
-        ctx.draw_circle(n.x * 20, n.y * 20, 5);
+        ctx.set_fill_color({84,105,28,255}); // Green fill
+        ctx.set_stroke_color({255,255,255,255}); // Green stroke
+        ctx.draw_circle(n.x * 50, n.y * 50, 10);
         ctx.fill();
         ctx.stroke();
       }
+      ctx.close_path();
+      ctx.begin_path();
+      for (const auto& n : rect_activenodes)
+      {
+        ctx.set_fill_color({255,255,255,255});
+        ctx.set_stroke_color({255,255,255,255});
+        ctx.draw_text(n.x * 50, n.y * 50, "1");
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.close_path();
       ctx.update();
-
     }
   };
 
