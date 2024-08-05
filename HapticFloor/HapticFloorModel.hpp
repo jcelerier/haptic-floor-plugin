@@ -9,6 +9,7 @@
 #include <halp/layout.hpp>
 #include <avnd/concepts/painter.hpp>
 #include <vector>
+#include <cmath>
 
 namespace Example
 {
@@ -80,28 +81,43 @@ public:
     void paint(avnd::painter auto ctx)
     {
       ctx.set_stroke_width(2.0);
-
-      //draw active nodes
-      for (const auto& n : rect_activenodes)
-      {
-        ctx.set_fill_color({0, 255, 0, 255});
-        ctx.draw_circle(n.x * 20, n.y * 20, 5);
-      }
-
-      //draw passive nodes
-      for (const auto& n : rect_passivenodes)
-      {
-        ctx.set_fill_color({255, 0, 0, 255});
-        ctx.draw_circle(n.x * 20, n.y * 20, 5);
-      }
-
-      //draw lines to form the mesh
-      ctx.set_stroke_color({0, 0, 255, 255});
+      ctx.set_stroke_color({.r = 255, .g = 255, .b = 255, .a = 255});
       ctx.begin_path();
       for (const auto& n : rect_activenodes)
       {
-        //find neighboring nodes
+        // Find neighboring nodes
         for (const auto& neighbor : rect_activenodes)
+        {
+          if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
+             (neighbor.x == n.x && neighbor.y == n.y + 1))
+          {
+            ctx.move_to(n.x * 20, n.y * 20);
+            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+          }
+        }
+        for (const auto& neighbor : rect_passivenodes)
+        {
+          if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
+             (neighbor.x == n.x && neighbor.y == n.y + 1))
+          {
+            ctx.move_to(n.x * 20, n.y * 20);
+            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+          }
+        }
+      }
+      for (const auto& n : rect_passivenodes)
+      {
+        // Find neighboring nodes
+        for (const auto& neighbor : rect_activenodes)
+        {
+          if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
+             (neighbor.x == n.x && neighbor.y == n.y + 1))
+          {
+            ctx.move_to(n.x * 20, n.y * 20);
+            ctx.line_to(neighbor.x * 20, neighbor.y * 20);
+          }
+        }
+        for (const auto& neighbor : rect_passivenodes)
         {
           if ((neighbor.x == n.x + 1 && neighbor.y == n.y) ||
              (neighbor.x == n.x && neighbor.y == n.y + 1))
@@ -113,7 +129,27 @@ public:
       }
       ctx.stroke();
       ctx.close_path();
+
+      // Draw passive nodes
+      for (const auto& n : rect_passivenodes)
+      {
+        ctx.set_fill_color({0, 0, 255, 255}); // Blue fill
+        ctx.set_stroke_color({0, 0, 255, 255}); // Blue stroke
+        ctx.draw_circle(n.x * 20, n.y * 20, 5);
+        ctx.fill();
+        ctx.stroke();
+      }
+      // Draw active nodes
+      for (const auto& n : rect_activenodes)
+      {
+        ctx.set_fill_color({0, 255, 0, 255}); // Green fill
+        ctx.set_stroke_color({0, 255, 0, 255}); // Green stroke
+        ctx.draw_circle(n.x * 20, n.y * 20, 5);
+        ctx.fill();
+        ctx.stroke();
+      }
       ctx.update();
+
     }
   };
 
@@ -153,7 +189,7 @@ public:
 
     struct
     {
-      halp_meta(layout, halp::layouts::vbox)
+      halp_meta(layout, halp::layouts::hbox)
       halp_meta(name, "haptic_floor")
       halp_meta(width, 300)
       halp_meta(height, 200)

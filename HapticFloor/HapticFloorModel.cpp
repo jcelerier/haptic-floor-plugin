@@ -40,7 +40,7 @@ void HapticFloor::loadLayout()
         }
 
         if (isActive) {
-          m_activenodes.push_back(node{.x = x,  .y= y, .channel = channel, .isActive = true});
+          m_activenodes.emplace_back(node{.x = x,  .y= y, .channel = channel, .isActive = true});
         } else {
           m_passivenodes.emplace_back(node{.x = x,  .y= y});
         }
