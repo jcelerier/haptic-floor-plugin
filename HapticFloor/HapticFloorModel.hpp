@@ -177,12 +177,15 @@ public:
       for (const auto& n : rect_activenodes)
       {
         ctx.begin_path();
-        // Calculate color based on value
-        uint8_t r = static_cast<uint8_t>((1 + n.value) * 127.5);
-        uint8_t g = static_cast<uint8_t>(255 - std::abs(static_cast<int>(n.value * 255)));
-        uint8_t b = static_cast<uint8_t>(255 - static_cast<int>((1 + n.value) * 127.5));
 
-        ctx.set_fill_color({r, g, b, 255});
+        // Normalize the value to range [0, 1]
+        float normalized_value = (n.value + 1.0f) / 2.0f;
+
+        // Interpolate between dark blue and light blue
+        uint8_t g = static_cast<uint8_t>(normalized_value * 255);      // Transition from 0 (dark blue) to 255 (light blue)
+        uint8_t b = static_cast<uint8_t>(normalized_value * 255);      // Blue component varies from dark to light
+
+        ctx.set_fill_color({0, g, b, 255});
         ctx.set_stroke_color({255, 255, 255, 255});
         ctx.draw_circle((n.x - center_x) * scale + width() / 2, (n.y - center_y) * scale + height() / 2, 10);
         ctx.fill();
