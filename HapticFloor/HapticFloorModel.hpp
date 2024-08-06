@@ -58,6 +58,7 @@ public:
     int y = 0;
     int channel = 0;
     bool isActive = false;
+    float value = 0;
 
     //Since the coordinates given by the json file are not cartesian,
     //we can modify them to draw an actual mesh of triangle
@@ -173,16 +174,21 @@ public:
       ctx.close_path();
 
       //Draw active nodes
-      ctx.begin_path();
       for (const auto& n : rect_activenodes)
       {
-        ctx.set_fill_color({84, 105, 28, 255});
+        ctx.begin_path();
+        // Calculate color based on value
+        uint8_t r = static_cast<uint8_t>((1 + n.value) * 127.5);
+        uint8_t g = static_cast<uint8_t>(255 - std::abs(static_cast<int>(n.value * 255)));
+        uint8_t b = static_cast<uint8_t>(255 - static_cast<int>((1 + n.value) * 127.5));
+
+        ctx.set_fill_color({r, g, b, 255});
         ctx.set_stroke_color({255, 255, 255, 255});
         ctx.draw_circle((n.x - center_x) * scale + width() / 2, (n.y - center_y) * scale + height() / 2, 10);
         ctx.fill();
         ctx.stroke();
+        ctx.close_path();
       }
-      ctx.close_path();
 
       //Draw the channels on active nodes
       ctx.begin_path();
@@ -270,6 +276,7 @@ public:
     for (const auto& val : inputs.in_i.ports) {
       if (index < numberOfChannels) {
         outputs.out.value[index] = val;
+        m_activenodes[index].value=val;
         ++index;
       } else {
         index = 0;
