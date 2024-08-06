@@ -5,13 +5,13 @@ namespace Example
 {
 void HapticFloor::loadLayout()
 {
-  //reset the layout in case of an already loaded layout
+  //Reset the layout in case of an already loaded layout
   m_activenodes={};
   m_passivenodes={};
 
   try
   {
-    //parsing process to extract the data defining the haptic floor
+    //Parsing process to extract the data defining the haptic floor
     rapidjson::Document doc;
     doc.Parse(inputs.layout.value);
     if(doc.HasParseError())
@@ -47,6 +47,13 @@ void HapticFloor::loadLayout()
       } else {
         return;
       }
+    }
+    //Since the coordinates are cartesians we apply our transform to be able to draw an actual triangle mesh
+    for (auto& n : m_activenodes){
+      n.coordinateToMesh();
+    }
+    for (auto& n : m_passivenodes){
+      n.coordinateToMesh();
     }
   }
   catch(...)
