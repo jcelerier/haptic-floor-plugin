@@ -59,5 +59,9 @@ void HapticFloor::loadLayout()
   catch(...)
   {
   }
+
+  if(send_message)
+    send_message(processor_to_ui{
+        .send_activenodes = m_activenodes, .send_passivenodes = m_passivenodes});
 }
 }
