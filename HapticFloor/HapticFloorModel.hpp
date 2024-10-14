@@ -1,15 +1,18 @@
 #pragma once
+#include <ossia/detail/json.hpp>
 
+#include <avnd/concepts/painter.hpp>
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
+#include <halp/dynamic_port.hpp>
+#include <halp/layout.hpp>
 #include <halp/meta.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
-#include <halp/dynamic_port.hpp>
-#include <halp/layout.hpp>
-#include <avnd/concepts/painter.hpp>
-#include <vector>
+
 #include <cmath>
+
+#include <vector>
 
 namespace Example
 {
